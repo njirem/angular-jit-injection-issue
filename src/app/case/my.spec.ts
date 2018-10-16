@@ -1,34 +1,34 @@
 import { TestBed, async } from '@angular/core/testing';
-import { BrokenChildComponent } from './child.component';
-import { WorkingChildComponent } from './both.components';
+import { BrokenComponent } from './broken.component';
+import { WorkingComponent } from './working.component';
 import { SomeService } from './some.service';
 
-fdescribe('Issue', () => {
-    describe('BrokenComponent', () => {
-        beforeEach(async(() => {
-            TestBed.configureTestingModule({
-                providers: [SomeService],
-                declarations: [BrokenChildComponent],
-            }).compileComponents();
-        }));
+describe('when a component inherits from another class', () => {
+    let injectedService: SomeService;
 
-        it('should be able to create the component', () => {
-            const fixture = TestBed.createComponent(BrokenChildComponent);
-            expect(fixture.componentInstance.injected.prop).toBeTruthy();
+    beforeEach(async(() => {
+        TestBed.configureTestingModule({
+            providers: [SomeService],
+            declarations: [BrokenComponent, WorkingComponent],
+        }).compileComponents();
+        injectedService = TestBed.get(SomeService);
+    }));
+
+    describe('in the same file', () => {
+        it('should inject the service declared by the superclass', () => {
+            const fixture = TestBed.createComponent(WorkingComponent);
+            expect(fixture.componentInstance.injected).toBeTruthy();
+            expect(fixture.componentInstance.injected).toBe(injectedService);
+            // This works as expected.
         });
     });
 
-    describe('WorkingComponent', () => {
-        beforeEach(async(() => {
-            TestBed.configureTestingModule({
-                providers: [SomeService],
-                declarations: [WorkingChildComponent],
-            }).compileComponents();
-        }));
-
-        it('should be able to create the component', () => {
-            const fixture = TestBed.createComponent(WorkingChildComponent);
-            expect(fixture.componentInstance.injected.prop).toBeTruthy();
+    describe('in separate files', () => {
+        it('should inject the service declared by the superclass', () => {
+            const fixture = TestBed.createComponent(BrokenComponent);
+            expect(fixture.componentInstance.injected).toBeTruthy();
+            expect(fixture.componentInstance.injected).toBe(injectedService);
+            // This fails.
         });
     });
 });
