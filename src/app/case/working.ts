@@ -6,6 +6,9 @@ export class Parent {
     constructor(readonly injected: SomeService) { }
 }
 
+@Injectable()
+export class WorkingService extends Parent { }
+
 @Component({
     template: '<h1>{{ injected.prop }}</h1>',
 })
